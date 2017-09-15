@@ -3,15 +3,13 @@
 
 > Import code that compiles to WebAssembly (or binaries) with Rollup
 
-Use this [Rollup plugin](https://rollupjs.org) to import code such as C, C++, Rust, Wat, or anything that compiles to WebAssembly by importing the standalone binary.
+Use this [Rollup plugin](https://rollupjs.org) to import code such as C, C++, Rust, Wat, or anything that compiles to WebAssembly by importing the standalone binary.  The configs currently supported:
 
-Languages supported out-of-the-box currently:
-
- - C/C++: Using `wasm(emscripten)` with [Emscripten](https://github.com/kripken/emscripten)
- - Wat: Using `wasm(wabt)` with [WABT](https://github.com/webassembly/wabt)
+ - C/C++ using  [Emscripten](https://github.com/kripken/emscripten) (see [`wasm(emscripten)`](#wasmemscripten))
+ - WAT (WebAssembly text format) using [WABT](https://github.com/webassembly/wabt) (see [`wasm(wabt)`](#wasmwabt))
  - Others? [Submit an issue](https://github.com/jamen/rollup-plugin-wasm/issues/new)
 
-Wrapping compilers can be done yourself and published as packages. See [Configurations](#configurations) and [`src/index.js`](https://github.com/jamen/rollup-plugin-wasm/blob/master/src/index.js) for more details.
+Wrapping compilers can also be done yourself as a separate package. See [Configurations](#configurations) and [`src/index.js`](https://github.com/jamen/rollup-plugin-wasm/blob/master/src/index.js) for more details.
 
 ## Install
 
@@ -19,7 +17,7 @@ Wrapping compilers can be done yourself and published as packages. See [Configur
 npm i -D rollup-plugin-wasm
 ```
 
-**Note:** Compiling `.wat`/`.wast` files requires [installing WABT's `wat2wasm`](https://github.com/webassembly/wabt).
+**Note:** In order for built-in configs to work, you must install and build their parent projects.
 
 ## Usage
 
