@@ -1,9 +1,17 @@
 
 # rollup-plugin-wasm
 
-> Import WebAssembly modules using Rollup
+> Import code that compiles to WebAssembly (or binaries) with Rollup
 
-Use this [Rollup plugin](https://rollupjs.org) to import [WebAssembly](https://webassembly.org) modules. All `.wasm` files are embed as base64 strings.  Additionally, `.wat` and `.wast` files are compiled with [WABT](https://github.com/webassembly/wabt) before being embedded. (See also [`webassembly-binary-toolkit`](https://npmjs.com/webassembly-binary-toolkit))
+Use this [Rollup plugin](https://rollupjs.org) to import code such as C, C++, Rust, Wat, or anything that compiles to WebAssembly by importing the standalone binary.
+
+Languages supported out-of-the-box currently:
+
+ - C/C++: Using `wasm(emscripten)` with [Emscripten](https://github.com/kripken/emscripten)
+ - Wat: Using `wasm(wabt)` with [WABT](https://github.com/webassembly/wabt)
+ - Others? [Submit an issue](https://github.com/jamen/rollup-plugin-wasm/issues/new)
+
+Wrapping compilers can be done yourself and published as packages. See [Configurations](#configurations) and [`src/index.js`](https://github.com/jamen/rollup-plugin-wasm/blob/master/src/index.js) for more details.
 
 ## Install
 
@@ -15,30 +23,95 @@ npm i -D rollup-plugin-wasm
 
 ## Usage
 
-Load the plugin in your Rollup config:
+Load the plugin in your `rollup.config.js`:
 
 ```js
 import wasm from 'rollup-plugin-wasm'
 
 export default {
-  plugins: [
-    wasm()
-  ]
+  plugins: [ wasm() ]
 }
 ```
 
-Which allows you to import `.wasm`/`.wat`/`.wast` files:
+## `wasm()`
+
+The base of the plugin lets you require plain `.wasm` files.  You can use your own commands to compile standalone binaries, and then import them from JavaScript.
 
 ```js
-import example from './example.wat'
+import createFoo from './foo.wasm'
 
-// WASM module signature:
-// init(imports?) -> Promise<exports?>
+var foo = createFoo(imports)
 
-example().then(fns => {
-  fns.main()
-})
+foo.main()
 ```
 
-The WASM program is embedded in your bundle as base64, so there is 33% overhead in size.
+## `wasm(emscripten)`
+
+For importing C/C++, an `emscripten` config is provided. It uses [Emscripten](https://github.com/kripken/emscripten)'s `emcc` command for the compilation.
+
+```js
+import wasm, { emscripten } from 'rollup-plugin-wasm'
+
+export default {
+  plugins: [ wasm(emscripten) ]
+}
+```
+
+Then import and use C/C++ functions directly:
+
+```js
+import { _main } from './foo.cc'
+
+_main()
+```
+
+## `wasm(wabt)`
+
+Another config for importing `.wat` files is available, which uses [WABT](https://github.com/WebAssembly/WABT)'s `wat2wasm` command for the compilation.
+
+```js
+import wasm, { wabt } from 'rollup-plugin-wasm'
+
+export default {
+  plugins: [ wasm(wabt) ]
+}
+```
+
+Then require `.wat` or `.wast` files:
+
+```js
+import createFoo from './foo.wat'
+
+const foo = createFoo()
+
+foo.main()
+```
+
+## Configurations
+
+The configuration objects are expressed as:
+
+```js
+{
+  compile(code, id): Promise<wasm>,
+  load(wasm): any
+}
+```
+
+The `compile` function is responsible for turning a source file into WebAssembly.  For example, spawning the command of a compiler and getting the results.
+
+The `load` function gets embed in the bundle, and is responsible for returning the exports for an import.  By default this is simply:
+
+```js
+load(wasm) -> init
+init(imports) -> exports
+```
+
+Which looks like:
+
+```js
+import createFoo from './source.ex'
+
+var { ...exports } = createFoo({ ...imports })
+```
 
