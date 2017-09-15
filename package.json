@@ -1,0 +1,30 @@
+{
+  "name": "rollup-plugin-wasm",
+  "description": "Import WebAssembly modules using Rollup",
+  "main": "./index.js",
+  "version": "0.0.0",
+  "author": "Jamen Marz <jamenmarz+gh@gmail.com>",
+  "license": "MIT",
+  "repository": "jamen/rollup-plugin-wasm",
+  "scripts": {
+    "prebuild": "rm -rf dist/*",
+    "build": "rollup -c",
+    "pretest": "npm run build",
+    "test": "node dist/test"
+  },
+  "devDependencies": {
+    "rollup": "^0.49.3",
+    "tape": "^4.8.0"
+  },
+  "dependencies": {
+    "tempy": "^0.2.0"
+  },
+  "keywords": [
+    "rollup",
+    "webassembly",
+    "import",
+    "wasm",
+    "wast",
+    "wat"
+  ]
+}
