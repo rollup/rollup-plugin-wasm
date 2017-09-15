@@ -2,7 +2,7 @@
   "name": "rollup-plugin-wasm",
   "description": "Import WebAssembly modules using Rollup",
   "main": "./index.js",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Jamen Marz <jamenmarz+gh@gmail.com>",
   "license": "MIT",
   "repository": "jamen/rollup-plugin-wasm",
