@@ -1,8 +1,6 @@
 
 import { rollup } from 'rollup'
 import wasm from '../src/index.js'
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
 import test from 'tape'
 
 test('bundles wasm code', t => {
