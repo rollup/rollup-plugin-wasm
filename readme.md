@@ -31,7 +31,7 @@ export default {
 }
 ```
 
-## `wasm()`
+### `wasm()`
 
 The base of the plugin lets you require plain `.wasm` files.  You can use your own commands to compile standalone binaries, and then import them from JavaScript.
 
@@ -43,7 +43,7 @@ var foo = createFoo(imports)
 foo.main()
 ```
 
-## `wasm(emscripten)`
+### `wasm(emscripten)`
 
 For importing C/C++, an `emscripten` config is provided. It uses [Emscripten](https://github.com/kripken/emscripten)'s `emcc` command for the compilation.
 
@@ -63,7 +63,7 @@ import { _main } from './foo.cc'
 _main()
 ```
 
-## `wasm(wabt)`
+### `wasm(wabt)`
 
 Another config for importing `.wat` files is available, which uses [WABT](https://github.com/WebAssembly/WABT)'s `wat2wasm` command for the compilation.
 
@@ -85,7 +85,7 @@ const foo = createFoo()
 foo.main()
 ```
 
-## Configurations
+### Configurations
 
 The configuration objects are expressed as:
 
