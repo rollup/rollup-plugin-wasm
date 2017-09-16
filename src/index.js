@@ -8,7 +8,10 @@ const read = promisify(fs.readFile)
 const unlink = promisify(fs.unlink)
 
 function compileWasm (code) {
-  if (code) return `export default _loadWasmModule('${code}')`
+  if (code) {
+    code = Buffer.from(code, 'binary').toString('base64')
+    return `export default _loadWasmModule('${code}')`
+  }  
 }
 
 export default function wasm (options = {}) {
@@ -56,7 +59,7 @@ export default function wasm (options = {}) {
     transform (code, id) {      
       if (/\.wasm$/.test(id)) {
         // Compile wasm -> js
-        return compileWasm(Buffer.from(code, 'binary').toString('base64'))
+        return compileWasm(code)
       } else if (options.compile) {
         // Compile source code -> wasm -> js
         return Promise.resolve(options.compile(code, id)).then(compileWasm)
@@ -70,7 +73,7 @@ export const emscripten = {
     if (/.(c|cc|cpp)$/.test(id)) {
       const temppath = temp({ extension: 'wasm' })
       return spawn('emcc', [id, '-Os', '-s', 'BINARYEN=1', '-s', 'SIDE_MODULE=1', '-o', temppath])
-        .then(results => read(temppath, 'base64'))
+        .then(results => read(temppath, 'binary'))
         .then(contents => unlink(temppath).then(() => contents))
     }    
   },
@@ -96,7 +99,7 @@ export const wabt = {
     if (/.wa(t|st)$/.test(id)) {
       const temppath = temp({ extension: 'wasm' })
       return spawn('wat2wasm', [id, '-o', temppath])
-        .then(results => read(temppath, 'base64'))
+        .then(results => read(temppath, 'binary'))
         .then(contents => unlink(temppath).then(() => contents))
     }
   },
