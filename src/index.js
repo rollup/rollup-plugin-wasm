@@ -7,7 +7,6 @@ import promisify from 'util-promisify'
 const read = promisify(fs.readFile)
 const unlink = promisify(fs.unlink)
 
-
 function compileWasm (code) {
   if (code) return `export default _loadWasmModule('${code}')`
 }

@@ -1,5 +1,5 @@
 
-import p from './sample.cc'
+import sample from './sample.cc'
 
-p._main()
+console.log(sample)
 

@@ -1,5 +1,5 @@
 
 import sample from './sample.wasm'
 
-console.log(sample())
+console.log(sample().main())
 

@@ -1,7 +1,7 @@
 
 # rollup-plugin-wasm
 
-> Import WebAssembly (or code that compiles to WebAssembly) with Rollup
+> Import WebAssembly code with Rollup
 
 Use this [Rollup plugin](https://rollupjs.org) to import code such as C, C++, Rust, Wat, anything that compiles to WebAssembly, or `.wasm` binaries themselves.  The built-in configs include:
 

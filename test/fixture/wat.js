@@ -1,5 +1,5 @@
 
-import test from './sample.wat'
+import sample from './sample.wat'
 
-console.log(test())
+console.log(sample().main())
 
