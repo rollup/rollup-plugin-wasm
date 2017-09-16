@@ -2,7 +2,7 @@
   "name": "rollup-plugin-wasm",
   "description": "Import WebAssembly code with Rollup",
   "main": "dist/rollup-plugin-wasm",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Jamen Marz <jamenmarz+gh@gmail.com>",
   "license": "MIT",
   "repository": "jamen/rollup-plugin-wasm",
