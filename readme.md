@@ -3,7 +3,7 @@
 
 > Import WebAssembly code with Rollup
 
-Use this [Rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.  They are imported as a [`WebAssembly.Module`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) wrapped in a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), but you can use the `sync` option for small modules if you wish (see ["Sync Modules"](#sync_modules)).
+Use this [Rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.  They are imported as a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) from being compiled asynchronously, but you can use the `sync` option for small modules if you wish (see [Sync Modules](#sync_modules)).
 
 ## Install
 
@@ -45,7 +45,7 @@ sample
 
 The imports are simply [`WebAssembly.Module`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) objects which get instantiated by you.
 
-## Sync Modules
+### Sync Modules
 
 Small modules (< 4KB) can be compiled synchronously by specifying them in the config.
 
