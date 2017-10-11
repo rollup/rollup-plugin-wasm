@@ -3,9 +3,7 @@
 
 > Import WebAssembly code with Rollup
 
-Use this [Rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.
-
-By default, WebAssembly modules are imported as a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), But you can use the `sync` flag to specify otherwise (See ["Sync Modules"](#sync_modules)).
+Use this [Rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.  They are imported as a [`WebAssembly.Module`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) wrapped in a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), but you can use the `sync` option for small modules if you wish (see ["Sync Modules"](#sync_modules)).
 
 ## Install
 
@@ -13,11 +11,9 @@ By default, WebAssembly modules are imported as a [Promise](https://developer.mo
 npm i -D rollup-plugin-wasm
 ```
 
-**Note:** For quick-start configs to work you must install their parent projects (Emscripten, WABT, etc.)
-
 ## Usage
 
-First, load the plugin into your rollup config
+First, load the plugin into your rollup config.
 
 ```js
 import { rollup } from 'rollup'
@@ -31,7 +27,7 @@ export default {
 }
 ```
 
-Then import & instantiate WebAssembly modules:
+Then, you can import & instantiate WebAssembly modules.
 
 ```js
 import sample from './sample.wasm'
@@ -47,9 +43,11 @@ sample
 })
 ```
 
+The imports are simply [`WebAssembly.Module`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) objects which get instantiated by you.
+
 ## Sync Modules
 
-You can compile modules synchronously by specifying it in the config
+Small modules (< 4KB) can be compiled synchronously by specifying them in the config.
 
 ```js
 import { rollup } from 'rollup'
@@ -69,7 +67,7 @@ export default {
 }
 ```
 
-Which import the modules directly instead of being wrapped in a promise
+This imports the `WebAssembly.Module` directly instead of being wrapped in a promise.
 
 ```js
 import sample from './sample.wasm'

@@ -9,7 +9,7 @@ export default function wasm (options = {}) {
   return {
     name: 'wasm',
     
-    banner:  `\
+    banner:  `
       function _wasmLoadModule (sync, src) {
         var len = src.length
         var trailing = src[len-2] == '=' ? 2 : src[len-1] == '=' ? 1 : 0 

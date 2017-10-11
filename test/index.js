@@ -10,7 +10,7 @@ function testBundle (t, bundle) {
   })
 }
 
-test('async wasm code', t => {
+test('async compiling', t => {
   t.plan(1)
 
   rollup({
@@ -23,7 +23,7 @@ test('async wasm code', t => {
 })
 
 
-test('async wasm code', t => {
+test('sync compiling', t => {
   t.plan(1)
 
   rollup({
@@ -37,5 +37,22 @@ test('async wasm code', t => {
     ],
   })
   .then(bundle => testBundle(t, bundle))
+})
+
+test('imports', t => {
+  t.plan(1)
+
+  rollup({
+    input: 'test/fixture/imports.js',
+    plugins: [
+      wasm({
+        sync: [
+          'test/fixture/sample.wasm'
+        ]
+      })
+    ],
+  })
+  .then(bundle => testBundle(t, bundle))
+
 })
 

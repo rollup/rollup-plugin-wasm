@@ -4,7 +4,7 @@ import sample from './sample.wasm'
 sample
 .then(module => {
   return WebAssembly.instantiate(module, {
-    // ...
+    env: {}
   })
 })
 .then(instance => {
