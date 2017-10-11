@@ -1,41 +1,16 @@
 
-import fs from 'fs'
-import spawn from 'execa'
-import { file as temp } from 'tempy'
-import promisify from 'util-promisify'
-
-const read = promisify(fs.readFile)
-const unlink = promisify(fs.unlink)
-
-function compileWasm (code) {
-  if (code) {
-    code = Buffer.from(code, 'binary').toString('base64')
-    return `export default _loadWasmModule('${code}')`
-  }  
-}
+import path from 'path'
 
 export default function wasm (options = {}) {
   options = Object.assign({}, options)
 
-  // Default to simple universal load
-  if (!options.load) options.load = wabt.load
-
-  // Turn it into a string for embedding in client code
-  options.load = options.load.toString()
-
-  // Fix quirk where "foo () { }" method syntax breaks the expression
-  if (
-    /^([^\ ]+)(\s*)\(.*\)(\s*)\{/.test(options.load) &&
-    !/^function(\s*)\(/.test(options.load)
-  ) {
-    options.load = 'function ' + options.load
-  }
+  const syncFiles = (options.sync || []).map(x => path.resolve(x))
 
   return {
     name: 'wasm',
     
-    banner:  `\
-      function _loadWasmModule (src) {
+    banner:  `
+      function _wasmLoadModule (sync, src) {
         var len = src.length
         var trailing = src[len-2] == '=' ? 2 : src[len-1] == '=' ? 1 : 0 
         var buf = new Uint8Array((len * 3/4) - trailing)
@@ -52,64 +27,17 @@ export default function wasm (options = {}) {
           buf[b++] = ((third & 3) << 6) | (table[src.charCodeAt(i+3)] & 63)
         }
 
-        return (${options.load})(buf)
+        return sync ? new WebAssembly.Module(buf) : WebAssembly.compile(buf)
       }
     `.trim(),
     
     transform (code, id) {      
-      if (/\.wasm$/.test(id)) {
-        // Compile wasm -> js
-        return compileWasm(code)
-      } else if (options.compile) {
-        // Compile source code -> wasm -> js
-        return Promise.resolve(options.compile(code, id)).then(compileWasm)
+      if (code && /\.wasm$/.test(id)) {
+        const src = Buffer.from(code, 'binary').toString('base64')
+        const sync = syncFiles.indexOf(id) === -1
+        return `export default _wasmLoadModule(${+sync}, '${src}')`
       }
     }
   }
 }
-
-export const emscripten = {
-  compile (code, id) {
-    if (/.(c|cc|cpp)$/.test(id)) {
-      const temppath = temp({ extension: 'wasm' })
-      return spawn('emcc', [id, '-Os', '-s', 'BINARYEN=1', '-s', 'SIDE_MODULE=1', '-o', temppath])
-        .then(results => read(temppath, 'binary'))
-        .then(contents => unlink(temppath).then(() => contents))
-    }    
-  },
-  // From https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab
-  load (buf) {
-    var module = new WebAssembly.Module(buf)
-    var instance = new WebAssembly.Instance(module, {
-      env: {
-        memoryBase: 0,
-        tableBase: 0,
-        memory: new WebAssembly.Memory({ initial: 256 }),
-        table: new WebAssembly.Table({ initial: 0, element: 'anyfunc' }),
-        _puts: console.log
-      }
-    })
-    instance.exports.__post_instantiate()
-    return instance.exports 
-  }
-}
-
-export const wabt = {
-  compile (code, id) {
-    if (/.wa(t|st)$/.test(id)) {
-      const temppath = temp({ extension: 'wasm' })
-      return spawn('wat2wasm', [id, '-o', temppath])
-        .then(results => read(temppath, 'binary'))
-        .then(contents => unlink(temppath).then(() => contents))
-    }
-  },
-  load (buf) {
-    return imports => {
-        var module = WebAssembly.Module(buf)
-        var instance = WebAssembly.Instance(module, imports)
-        return instance.exports
-     }
-  }
-}
-
 

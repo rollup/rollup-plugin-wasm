@@ -3,13 +3,7 @@
 
 > Import WebAssembly code with Rollup
 
-Use this [Rollup plugin](https://rollupjs.org) to import source code which compiles to WebAssembly (such as C, C++, Wat, Rust), or just import standalone `.wasm` binaries.  There are a few configs to quick-start languages:
-
- - `wasm.emscripten` for C and C++ using [Emscripten](https://github.com/kripken/emscripten)
- - `wasm.wabt` for WAT using [WABT](https://github.com/webassembly/wabt)
- - Others? [Submit an issue](https://github.com/jamen/rollup-plugin-wasm/issues/new)
-
-You can also create your own configs. See [Configs](#configurations) and [`src/index.js`](https://github.com/jamen/rollup-plugin-wasm/blob/master/src/index.js) for more details.
+Use this [Rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.  They are imported as a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) from being compiled asynchronously, but you can use the `sync` option for small modules if you wish (see [Sync Modules](#sync_modules)).
 
 ## Install
 
@@ -17,91 +11,70 @@ You can also create your own configs. See [Configs](#configurations) and [`src/i
 npm i -D rollup-plugin-wasm
 ```
 
-**Note:** For quick-start configs to work you must install their parent projects (Emscripten, WABT, etc.)
-
 ## Usage
 
-Load the plugin in your `rollup.config.js`:
+First, load the plugin into your rollup config.
 
 ```js
+import { rollup } from 'rollup'
 import wasm from 'rollup-plugin-wasm'
 
 export default {
-  plugins: [ wasm() ]
+  input: 'web/index.js',
+  plugins: [
+    wasm()
+  ]
 }
 ```
 
-You can use the configs like so:
+Then, you can import & instantiate WebAssembly modules.
 
 ```js
-import wasm, { emscripten } from 'rollup-plugin-wasm'
+import sample from './sample.wasm'
+
+sample
+.then(module => {
+  return WebAssembly.instantiate(module, {
+    // imports
+  })
+})
+.then(instance => {
+  console.log(instance.exports.main())
+})
+```
+
+The imports are simply [`WebAssembly.Module`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) objects which get instantiated by you.
+
+### Sync Modules
+
+Small modules (< 4KB) can be compiled synchronously by specifying them in the config.
+
+```js
+import { rollup } from 'rollup'
+import wasm from 'rollup-plugin-wasm'
 
 export default {
-  plugins: [ wasm(emscripten) ]
+  input: 'web/index.js',
+  plugins: [
+    wasm({
+      sync: [
+        'web/sample.wasm',
+        'web/foobar.wasm',
+        'web/hello.wasm'
+      ]
+    })
+  ]
 }
 ```
 
-### `wasm(config)`
-
-The base of the plugin lets you require plain `.wasm` files.  You can use your own commands to compile standalone binaries, and then import them from JavaScript.
+This imports the `WebAssembly.Module` directly instead of being wrapped in a promise.
 
 ```js
-import createFoo from './foo.wasm'
+import sample from './sample.wasm'
 
-var foo = createFoo(imports)
+const instance = new WebAssembly.Instance(sample, {
+  // imports
+})
 
-foo.main()
+console.log(instance.exports.main())
 ```
-
-But, you may also provide a config for importing source files.  More info below
-
-### `wasm.emscripten`
-
-For importing C and C++ an `emscripten` config is provided. It uses [Emscripten](https://github.com/kripken/emscripten)'s `emcc` command for the compilation.
-
-```js
-import sample from './sample.cc'
-
-sample._main()
-```
-
-### `wasm.wabt`
-
-For importing `.wat` the `wabt` config is provided, which uses [WABT](https://github.com/WebAssembly/WABT)'s `wat2wasm` command for the compilation.
-
-
-```js
-import createFoo from './foo.wat'
-
-const foo = createFoo()
-
-foo.main()
-```
-
-### Configs
-
-The config objects are expressed as:
-
-```js
-{
-  compile(code, id): Promise<wasm>,
-  load(wasm): any
-}
-```
-
-The `compile` function is responsible for turning a source file into WebAssembly.  For example, spawning the command of a compiler and getting the results.
-
-The `load` function gets embed in the bundle, and is responsible for returning the exports for an import.  By default this is simply:
-
-```js
-load(wasm) -> init(imports) -> exports
-```
-
-Which looks like this from the source:
-
-```js
-import createFoo from './source.ex'
-
-var exports = createFoo(imports)
-```
-

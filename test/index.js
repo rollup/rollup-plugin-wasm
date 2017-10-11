@@ -3,63 +3,56 @@ import { rollup } from 'rollup'
 import wasm, { wabt, emscripten } from '../src/index.js'
 import test from 'tape'
 
-test('Bundling .wasm code', t => {
+function testBundle (t, bundle) {
+  bundle.generate({ format: 'cjs' })
+  .then(({ code }) => {
+    new Function('t', code)(t)
+  })
+}
+
+test('async compiling', t => {
   t.plan(1)
 
   rollup({
-    input: 'test/fixture/wasm.js',
+    input: 'test/fixture/sync.js',
     plugins: [
       wasm()
     ],
   })
-  .then(bundle => bundle.generate({ format: 'iife' }), t.error)
-  .then(result => {
-    t.true(result, 'got wasm bundle')
-    // demo:
-    // console.log(result.code)
-  })
+  .then(bundle => testBundle(t, bundle))
 })
 
-test('Bundling .wat code', t => {
-  t.plan(2)
 
-  rollup({
-    input: 'test/fixture/wat.js',
-    plugins: [
-      wasm(wabt)
-    ],
-  })
-  .then(bundle => bundle.generate({ format: 'iife' }), t.error)
-  .then(result => {
-    var code = result.code
-    var funcdef = code.indexOf('function _loadWasmModule')
-    var wasmimport = code.indexOf('_loadWasmModule(\'AG')
-    
-    t.not(-1, funcdef, 'found wasm load definition')
-    t.not(-1, wasmimport, 'found wasm load call')
-
-    // demo:
-    // console.log(code)
-  }, t.error)
-})
-
-test('Bundling .cc code', t => {
+test('sync compiling', t => {
   t.plan(1)
 
   rollup({
-    input: 'test/fixture/cc.js',
+    input: 'test/fixture/async.js',
     plugins: [
-      wasm(emscripten)
+      wasm({
+        sync: [
+          'test/fixture/sample.wasm'
+        ]
+      })
     ],
   })
-  .then(bundle => bundle.generate({ format: 'iife' }), t.error)
-  .then(result => {
-    var code = result.code
-    var funcdef = code.indexOf('anyfunc')
-    
-    t.not(-1, funcdef, 'found custom wasm load')
-
-    // demo:
-    // console.log(code)
-  }, t.error)
+  .then(bundle => testBundle(t, bundle))
 })
+
+test('imports', t => {
+  t.plan(1)
+
+  rollup({
+    input: 'test/fixture/imports.js',
+    plugins: [
+      wasm({
+        sync: [
+          'test/fixture/sample.wasm'
+        ]
+      })
+    ],
+  })
+  .then(bundle => testBundle(t, bundle))
+
+})
+
