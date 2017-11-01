@@ -2,7 +2,7 @@
   "name": "rollup-plugin-wasm",
   "description": "Import WebAssembly code with Rollup",
   "main": "dist/rollup-plugin-wasm",
-  "version": "2.0.0",
+  "version": "0.0.0-development",
   "author": "Jamen Marz <jamenmarz+gh@gmail.com>",
   "license": "MIT",
   "repository": "jamen/rollup-plugin-wasm",
@@ -13,11 +13,13 @@
     "prebuild": "rm -rf dist/*",
     "build": "rollup -c --silent",
     "pretest": "npm run build",
-    "test": "node dist/test"
+    "test": "node dist/test",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "devDependencies": {
     "rollup": "^0.49.3",
-    "tape": "^4.8.0"
+    "tape": "^4.8.0",
+    "semantic-release": "^8.2.0"
   },
   "keywords": [
     "rollup",
