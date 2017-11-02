@@ -4,8 +4,12 @@
   "main": "dist/rollup-plugin-wasm",
   "version": "0.0.0-development",
   "author": "Jamen Marz <jamenmarz+gh@gmail.com>",
+  "contributors": [
+    "Jamen Marz <jamenmarz+gh@gmail.com>",
+    "Colin Eberhardt <colin.eberhardt@gmail.com>"
+  ],
   "license": "MIT",
-  "repository": "jamen/rollup-plugin-wasm",
+  "repository": "https://github.com/rollup/rollup-plugin-wasm",
   "files": [
     "dist/rollup-plugin-wasm.js"
   ],

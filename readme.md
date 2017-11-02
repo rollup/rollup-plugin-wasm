@@ -1,22 +1,23 @@
 
 # rollup-plugin-wasm
 
-> Import WebAssembly code with Rollup
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
-Use this [Rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.  They are imported as a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) from being compiled asynchronously, but you can use the `sync` option for small modules if you wish (see [Sync Modules](#sync_modules)).
+> A rollup plugin that inlines (base64 encoded) and imports WebAssembly modules.
+
+Use this [rollup](https://github.com/rollup/rollup) plugin to import WebAssembly modules.  They are inlined and base64 encoded, with the compiled module binary returned as a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). For small modules you can use the `sync` option if you wish (see [Sync Modules](#sync_modules)).
 
 ## Install
 
 ```
-npm i -D rollup-plugin-wasm
+npm install --save-dev rollup-plugin-wasm
 ```
 
-## Usage
+## Configuration
 
-First, load the plugin into your rollup config.
+Simply add the plugin to your rollup config. Any imported file with the `wasm` extension will be processed by this plugin.
 
 ```js
-import { rollup } from 'rollup'
 import wasm from 'rollup-plugin-wasm'
 
 export default {
@@ -27,30 +28,35 @@ export default {
 }
 ```
 
-Then, you can import & instantiate WebAssembly modules.
+## Example
 
-```js
-import sample from './sample.wasm'
+Given the following simple C file, compiled to wasm (using emscripten, or the online [WasmFiddle](https://wasdk.github.io/WasmFiddle//) tool):
 
-sample
-.then(module => {
-  return WebAssembly.instantiate(module, {
-    // imports
-  })
-})
-.then(instance => {
-  console.log(instance.exports.main())
-})
-```
+~~~c
+int main() {
+  return 42;
+}
+~~~
 
-The imports are simply [`WebAssembly.Module`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) objects which get instantiated by you.
+The plugin will look for any wasm imports. For any it finds, the wasm file is inlined as a base64 encoded string (which means it will be ~33% larger than the original). At runtime the string is decoded and asynchronously compiled into a wasm module.
+
+To use the binary module returned by the plugin, you must first intantiate it as shown below:
+
+~~~javascript
+import wasm from './hello.wasm';
+
+wasm
+  .then(module => WebAssembly.instantiate(module))
+  .then(instance => {
+    console.log(instance.exports.main())
+  });
+~~~
 
 ### Sync Modules
 
-Small modules (< 4KB) can be compiled synchronously by specifying them in the config.
+Small modules (< 4KB) can be compiled synchronously by specifying them in the configuration.
 
 ```js
-import { rollup } from 'rollup'
 import wasm from 'rollup-plugin-wasm'
 
 export default {
@@ -67,14 +73,12 @@ export default {
 }
 ```
 
-This imports the `WebAssembly.Module` directly instead of being wrapped in a promise.
+This returns the binary module synchronously, which can be instantiated as follows:
 
 ```js
-import sample from './sample.wasm'
+import module from './hello.wasm'
 
-const instance = new WebAssembly.Instance(sample, {
-  // imports
-})
+const instance = new WebAssembly.Instance(module);
 
 console.log(instance.exports.main())
 ```
