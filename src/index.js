@@ -8,17 +8,17 @@ export default function wasm (options = {}) {
 
   return {
     name: 'wasm',
-    
+
     banner:  `
       function _wasmLoadModule (sync, src) {
         var len = src.length
-        var trailing = src[len-2] == '=' ? 2 : src[len-1] == '=' ? 1 : 0 
+        var trailing = src[len-2] == '=' ? 2 : src[len-1] == '=' ? 1 : 0
         var buf = new Uint8Array((len * 3/4) - trailing)
 
         var _table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
         var table = new Uint8Array(130)
         for (var c = 0; c < _table.length; c++) table[_table.charCodeAt(c)] = c
-        
+
         for (var i = 0, b = 0; i < len; i+=4) {
           var second = table[src.charCodeAt(i+1)]
           var third = table[src.charCodeAt(i+2)]
@@ -30,14 +30,13 @@ export default function wasm (options = {}) {
         return sync ? new WebAssembly.Module(buf) : WebAssembly.compile(buf)
       }
     `.trim(),
-    
-    transform (code, id) {      
+
+    transform (code, id) {
       if (code && /\.wasm$/.test(id)) {
         const src = Buffer.from(code, 'binary').toString('base64')
-        const sync = syncFiles.indexOf(id) === -1
+        const sync = syncFiles.indexOf(id) !== -1
         return `export default _wasmLoadModule(${+sync}, '${src}')`
       }
     }
   }
 }
-
