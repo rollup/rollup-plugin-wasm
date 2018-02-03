@@ -14,7 +14,7 @@ test('async compiling', t => {
   t.plan(1)
 
   rollup({
-    input: 'test/fixture/sync.js',
+    input: 'test/fixture/async.js',
     plugins: [
       wasm()
     ],
@@ -27,7 +27,7 @@ test('sync compiling', t => {
   t.plan(1)
 
   rollup({
-    input: 'test/fixture/async.js',
+    input: 'test/fixture/sync.js',
     plugins: [
       wasm({
         sync: [
@@ -47,7 +47,7 @@ test('imports', t => {
     plugins: [
       wasm({
         sync: [
-          'test/fixture/sample.wasm'
+          'test/fixture/imports.wasm'
         ]
       })
     ],
@@ -55,4 +55,3 @@ test('imports', t => {
   .then(bundle => testBundle(t, bundle))
 
 })
-
