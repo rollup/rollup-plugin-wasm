@@ -11,7 +11,7 @@ function testBundle (t, bundle) {
 }
 
 test('async compiling', t => {
-  t.plan(1)
+  t.plan(2)
 
   rollup({
     input: 'test/fixture/async.js',
@@ -24,7 +24,7 @@ test('async compiling', t => {
 
 
 test('sync compiling', t => {
-  t.plan(1)
+  t.plan(2)
 
   rollup({
     input: 'test/fixture/sync.js',

@@ -10,7 +10,7 @@ export default function wasm (options = {}) {
     name: 'wasm',
 
     banner:  `
-      function _wasmLoadModule (sync, src) {
+      function _loadWasmModule (sync, src, imports) {
         var len = src.length
         var trailing = src[len-2] == '=' ? 2 : src[len-1] == '=' ? 1 : 0
         var buf = new Uint8Array((len * 3/4) - trailing)
@@ -27,7 +27,14 @@ export default function wasm (options = {}) {
           buf[b++] = ((third & 3) << 6) | (table[src.charCodeAt(i+3)] & 63)
         }
 
-        return sync ? new WebAssembly.Module(buf) : WebAssembly.compile(buf)
+        if (imports && !sync) {
+          return WebAssembly.instantiate(buf, imports)
+        } else if (!imports && !sync) {
+          return WebAssembly.compile(buf)
+        } else {
+          var mod = new WebAssembly.Module(buf)
+          return imports ? new WebAssembly.Instance(mod, imports) : mod
+        }
       }
     `.trim(),
 
@@ -35,7 +42,7 @@ export default function wasm (options = {}) {
       if (code && /\.wasm$/.test(id)) {
         const src = Buffer.from(code, 'binary').toString('base64')
         const sync = syncFiles.indexOf(id) !== -1
-        return `export default _wasmLoadModule(${+sync}, '${src}')`
+        return `export default function(imports){return _loadWasmModule(${+sync}, '${src}', imports)}`
       }
     }
   }
