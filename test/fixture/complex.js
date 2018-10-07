@@ -1,5 +1,5 @@
 
-import sample from './tiny-mark.wasm'
+import sample from './complex.wasm'
 
 sample({
   env: {
