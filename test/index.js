@@ -22,6 +22,17 @@ test('async compiling', t => {
   .then(bundle => testBundle(t, bundle))
 })
 
+test('complex module decoding', t => {
+  t.plan(2)
+
+  rollup({
+    input: 'test/fixture/complex.js',
+    plugins: [
+      wasm()
+    ],
+  })
+  .then(bundle => testBundle(t, bundle))
+})
 
 test('sync compiling', t => {
   t.plan(2)
