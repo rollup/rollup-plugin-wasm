@@ -1,4 +1,4 @@
-
+import fs from 'fs'
 import path from 'path'
 
 export default function wasm (options = {}) {
@@ -8,6 +8,20 @@ export default function wasm (options = {}) {
 
   return {
     name: 'wasm',
+
+    load(id) {
+      if (/\.wasm$/.test(id)) {
+        return new Promise((resolve, reject) => {
+          fs.readFile(id, (error, buffer) => {
+            if (error != null) {
+              reject(error);
+            }
+            resolve(buffer.toString('binary'));
+          });
+        });
+      }
+      return null;
+    },
 
     banner:  `
       function _loadWasmModule (sync, src, imports) {
