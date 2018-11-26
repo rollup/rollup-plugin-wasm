@@ -14,16 +14,17 @@
     "dist/rollup-plugin-wasm.js"
   ],
   "scripts": {
-    "prebuild": "rm -rf dist/*",
+    "prebuild": "rimraf dist",
     "build": "rollup -c --silent",
     "pretest": "npm run build",
     "test": "node dist/test",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "devDependencies": {
+    "rimraf": "^2.6.2",
     "rollup": "^0.49.3",
-    "tape": "^4.8.0",
-    "semantic-release": "^8.2.0"
+    "semantic-release": "^8.2.0",
+    "tape": "^4.8.0"
   },
   "keywords": [
     "rollup",
