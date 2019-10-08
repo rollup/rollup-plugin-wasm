@@ -33,7 +33,7 @@ export default function wasm (options = {}) {
           var raw = window.atob(src)
           var rawLength = raw.length
           buf = new Uint8Array(new ArrayBuffer(rawLength))
-          for(i = 0; i < rawLength; i++) {
+          for(var i = 0; i < rawLength; i++) {
              buf[i] = raw.charCodeAt(i)
           }
         }
