@@ -43,7 +43,7 @@ Import and instantiate the resulting file:
 ```js
 import wasm from './sample.wasm';
 
-sample({ ...imports }).then(({ instance }) => {
+wasm({ ...imports }).then(({ instance }) => {
   console.log(instance.exports.main())
 })
 ```
