@@ -1,3 +1,5 @@
+# Plugin Being Moved
+Please stand by, we're moving this plugin to a new monorepo.
 
 # rollup-plugin-wasm
 
