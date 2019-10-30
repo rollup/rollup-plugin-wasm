@@ -1,5 +1,6 @@
-# Plugin Being Moved
-Please stand by, we're moving this plugin to a new monorepo.
+# Moved
+
+This module has moved and is now available at [@rollup/plugin-wasm](https://github.com/rollup/plugins). Please update your dependencies. This repository is no longer maintained.
 
 # rollup-plugin-wasm
 
